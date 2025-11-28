@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - Notification System{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Dashboard</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">By State</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for state, count in stats_by_state %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ state|capitalize }}
+                                <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">By Channel</div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for channel, count in stats_by_channel %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ channel|capitalize }}
+                                <span class="badge bg-secondary rounded-pill">{{ count }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-3">Recent Notifications</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Channel</th>
+                    <th>Recipient</th>
+                    <th>State</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notification in recent_notifications %}
+                    <tr>
+                        <td>{{ notification.id }}</td>
+                        <td><span class="badge bg-info text-dark">{{ notification.channel }}</span></td>
+                        <td>{{ notification.recipient }}</td>
+                        <td>
+                            <span class="badge bg-{{ notification.state == 'sent' ? 'success' : (notification.state == 'failed' ? 'danger' : 'warning') }}">
+                                {{ notification.state }}
+                            </span>
+                        </td>
+                        <td>{{ notification.createdAt|date('Y-m-d H:i:s') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+framework:
+    workflows:
+        notification:
+            type: 'state_machine'
+            audit_trail:
+                enabled: true
+            marking_store:
+                type: 'method'
+                property: 'state'
+            supports:
+                - App\Entity\Notification
+            initial_marking: draft
+            places:
+                - draft
+                - approved
+                - sending
+                - sent
+                - failed
+            transitions:
+                approve:
+                    from: draft
+                    to: approved
+                    guard: "subject.getRecipient() != '' and subject.getMessage() != ''"
+                send:
+                    from: approved
+                    to: sending
+                mark_as_sent:
+                    from: sending
+                    to: sent
+                mark_as_failed:
+                    from: sending
+                    to: failed
+                retry:
+                    from: failed
+                    to: approved
+                    guard: "subject.getRetryCount() < 3"
+

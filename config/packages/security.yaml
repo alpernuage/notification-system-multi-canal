@@ -3,18 +3,30 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
+    # Role hierarchy: ROLE_ADMIN inherits ROLE_API
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_API]
+
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        users_in_memory:
+            memory:
+                users:
+                    admin: { password: '$2y$13$/0ya3NTVrUXGNNTN1VLWUe0dBqjz1wxlHtHgrsGAGB/k4aePHwEyy', roles: ['ROLE_ADMIN'] } # password: admin
+                    api_user: { password: '$2y$13$rGIw.Q.vOu.9432mJpr0XOfNAgAidMyr.FgR/C3LpA7cARUHz8VZG', roles: ['ROLE_API'] } # password: api_pass
+
+
+
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
-            pattern: ^/(_profiler|_wdt|assets|build)/
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
             provider: users_in_memory
+            http_basic:
+                realm: Secured Area
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -22,10 +34,10 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
-    # Note: Only the *first* matching rule is applied
+    # Easy way to control access the whole application
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/dashboard, roles: ROLE_ADMIN }
+         - { path: ^/api, roles: ROLE_API }
 
 when@test:
     security:
